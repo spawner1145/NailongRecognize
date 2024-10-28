@@ -39,7 +39,10 @@ def convert_images_to_jpg(directory):
     
     for image_file in image_files:
         if image_file.lower().endswith('.gif'):
-            process_gif(image_file, directory)
+            if directory == './input':  # 如果目录是'./input'，则不调用process_gif
+                continue  # 跳过.gif文件
+            else:
+                process_gif(image_file, directory)
         elif not image_file.lower().endswith('.jpg'):
             img = Image.open(image_file).convert('RGB')
             jpg_path = os.path.join(directory, f"{os.path.splitext(os.path.basename(image_file))[0]}.jpg")
@@ -220,23 +223,35 @@ model_path = './nailong.pth'
 torch.save(model.state_dict(), model_path)
 print(f"Model saved to {model_path}")
 
-# 测试
+# 预测单张图像或GIF的所有帧
+def predict_image_or_gif(file_path, model, transform):
+    model.eval()
+    if file_path.lower().endswith('.gif'):
+        gif = Image.open(file_path)
+        for frame in ImageSequence.Iterator(gif):
+            frame = frame.convert('RGB')
+            image = transform(frame).unsqueeze(0).to('cuda' if torch.cuda.is_available() else 'cpu')
+            with torch.no_grad():
+                output = model(image)
+                _, pred = torch.max(output, 1)
+                if pred.item() == 1:
+                    return True  # 发现奶龙元素
+        return False  # 没有发现奶龙元素
+    else:
+        image = Image.open(file_path).convert('RGB')
+        image = transform(image).unsqueeze(0).to('cuda' if torch.cuda.is_available() else 'cpu')
+        with torch.no_grad():
+            output = model(image)
+            _, pred = torch.max(output, 1)
+        return pred.item() == 1  # 返回是否为奶龙元素
+
+# 测试输入目录中的所有文件
 def test_input_directory(input_dir, model, transform):
-    image_files = glob.glob(os.path.join(input_dir, '*.jpg'))
+    image_files = glob.glob(os.path.join(input_dir, '*.*'))
     
     for image_file in image_files:
-        result = predict_image(image_file, model, transform)
-        print(f"Image: {image_file}, Prediction: {'True' if result == 1 else 'False'}")
-
-# 预测
-def predict_image(image_path, model, transform):
-    model.eval()
-    image = Image.open(image_path).convert('RGB')  # 转换为RGB图像
-    image = transform(image).unsqueeze(0).to('cuda' if torch.cuda.is_available() else 'cpu')
-    with torch.no_grad():
-        output = model(image)
-        _, pred = torch.max(output, 1)
-    return pred.item()
+        result = predict_image_or_gif(image_file, model, transform)
+        print(f"File: {image_file}, Prediction: {'True' if result else 'False'}")
 
 # 输入目录
 input_dir = './input'
