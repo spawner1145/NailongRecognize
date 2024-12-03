@@ -15,17 +15,20 @@ from imblearn.pipeline import Pipeline
 import numpy as np
 import cv2
 
-# 处理GIF图像，提取第一帧并保存为JPG格式
+# 处理GIF图像，提取每一帧并保存为JPG格式
 def process_gif(gif_path, output_dir):
     try:
         gif = Image.open(gif_path)
-        first_frame = next(ImageSequence.Iterator(gif))
-        first_frame = first_frame.convert('RGB')
-        frame_path = os.path.join(output_dir, f"{os.path.splitext(os.path.basename(gif_path))[0]}.jpg")
-        first_frame.save(frame_path, 'JPEG')
-        print(f"Saved first frame to {frame_path}")
-        
-        # 删除原始GIF文件
+        frame_num = 0
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        for frame in ImageSequence.Iterator(gif):
+            rgb_frame = frame.convert('RGB')
+            frame_filename = f"{os.path.splitext(os.path.basename(gif_path))[0]}_frame_{frame_num:03d}.jpg"
+            frame_path = os.path.join(output_dir, frame_filename)
+            rgb_frame.save(frame_path, 'JPEG')
+            print(f"Saved frame {frame_num} to {frame_path}")
+            frame_num += 1
         gif.close()
         os.remove(gif_path)
         print(f"Deleted original GIF file: {gif_path}")
