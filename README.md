@@ -1,5 +1,7 @@
 # 唐死我了，这是一个奶龙鉴别模型及其训练代码和数据集，byd一边做一边笑
-### 更为强大的运用了强化学习思想的版本[NailongRecognizeRL](https://github.com/spawner1145/NailongRecognizeRL.git)
+
+## 已有更为强大的运用了强化学习思想的版本[NailongRecognizeRL](https://github.com/spawner1145/NailongRecognizeRL.git)，欢迎来看看
+
 ### 基于resnet50训练
 ### release里获取最新模型和数据集
 ### 理论上这个库可以进行所有二分类模型训练，只要自己改掉train和test以及相应negative文件夹内的图片再运行train.py就可以做自己想要的图片分类（检测图片中是否有某元素，输出是或否）
