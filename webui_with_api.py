@@ -21,7 +21,18 @@ def get_model_list():
 def predict(file, model_name):
     if file is None:
         return "请上传图片、GIF或视频文件"
-    file_bytes = file.read()
+    # 兼容file为文件对象或字符串
+    if hasattr(file, "read"):
+        file_bytes = file.read()
+    elif isinstance(file, str):
+        try:
+            import base64
+            file_bytes = base64.b64decode(file)
+        except Exception:
+            with open(file, "rb") as f:
+                file_bytes = f.read()
+    else:
+        return "文件格式不支持"
     base64_str = base64.b64encode(file_bytes).decode()
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -40,7 +51,8 @@ def create_gradio_interface():
         ],
         outputs=gr.Textbox(label="检测结果"),
         title="元素检测",
-        description="上传图片、GIF或视频，检测是否包含元素"
+        description="上传图片、GIF或视频，检测是否包含元素",
+        allow_flagging="never"
     )
 
 
