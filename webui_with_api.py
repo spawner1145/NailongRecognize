@@ -39,7 +39,7 @@ def predict(file, model_name):
     model_path = os.path.join(script_dir, model_name)
     model = load_model(model_path, device)
     result = detect_nailong_from_base64(base64_str, model, test_transform, device)
-    return "检测到元素" if result else "未检测到元素"
+    return "检测到元素(True)" if result else "未检测到元素(False)"
 
 def create_gradio_interface():
     model_list = get_model_list()
@@ -52,7 +52,7 @@ def create_gradio_interface():
         outputs=gr.Textbox(label="检测结果"),
         title="元素检测",
         description="上传图片、GIF或视频，检测是否包含元素",
-        allow_flagging="never"
+        allow_flagging="never",
     )
 
 
