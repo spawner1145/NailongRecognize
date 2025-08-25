@@ -14,3 +14,5 @@
 一代https://github.com/avilliai/Manyana.git
 ### 上面的机器人如果要更换模型打开plugins/nailong11文件夹把里面的nailong.pth替换掉
 ### 奶龙识别nonebot机器人插件链接，作者445，https://github.com/superbot-ai445/nonebot-plugin-nailongremove.git
+
+### 运行 `python webui_with_api.py` 快速启动推理webui和api服务，会自动读取目录下的所有可选pth模型，但需要额外`pip install fastapi uvicorn[standard] gradio`
